@@ -1,6 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Public"
   ],
+  "SelectedNode": "\\Public\\Get-MySQLConnection.ps1",
   "PreviewInSolutionExplorer": false
 }
