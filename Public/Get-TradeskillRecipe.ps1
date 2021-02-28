@@ -3,7 +3,7 @@ Function Get-TradeskillRecipe {
 	param (
 		# SQL Connection
 		[Parameter(Mandatory = $true)]
-		[PSTypeName("SQLConnection")]
+		[object]
 		$connection,
 
 		# Item Name
@@ -33,7 +33,7 @@ Function Get-TradeskillRecipe {
 		# Show user items
 		Write-Host "$itemName Requires:"
 		foreach ($ingredient in $ingredients){
-			if ($ingredient.iscontainer -neq 1){
+			if ($ingredient.iscontainer -ne 1){
 				$ingredientId = $ingredient.item_id
 				$ingredientDetails = Select-MySQL -Connection $connection -table "items" -where "id = $ingredientId"
 				Write-Host "- $ingredientDetails.Name"
@@ -47,10 +47,7 @@ Function Get-TradeskillRecipe {
 						Write-Host "- $ingredientDetails.Name"
 					}
 				}
-				
 			}
 		}
-
 	}
-	
 }
