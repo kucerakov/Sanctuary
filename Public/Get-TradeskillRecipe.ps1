@@ -1,23 +1,11 @@
 Function Get-TradeskillRecipe {
 	[CmdletBinding()]
 	param (
-		# SQL Connection
-		[Parameter(Mandatory = $true)]
-		[object]
-		$connection,
-
 		# Item Name
 		[Parameter(Mandatory = $true)]
 		[string]
 		$itemName
 	)
-
-	# Extra check to ensure a connection was passed in
-	if ($connection -eq $null){
-			Write-Error "Must pass in SQL Connection. Run $connection = Get-SQLConnection and pass in $connection to this function."
-			return
-	}
-
 
     # Initialize arrays
     $creationList= @()
@@ -25,7 +13,8 @@ Function Get-TradeskillRecipe {
     $containerlist = @()
 
 	# Get SQL row
-	$tsRecipes = Select-MySQL -Connection $connection -table "tradeskill_recipe" -where "name = '$itemName'"
+	$tsRecipes = Invoke-MySQLQuery -Query "SELECT * FROM tradeskill_recipe WHERE name = ""$itemName"""
+    #$tsRecipes = Select-MySQL -Connection $connection -table "tradeskill_recipe" -where "name = '$itemName'"
 	if ($tsRecipes -eq $null){
 		Write-Error "<$itemName> not found in tradeskill_recipe table."
 		return
@@ -34,7 +23,8 @@ Function Get-TradeskillRecipe {
 	# Get items needed for recipe, there could be more than one way to make it
 	foreach ($tsRecipe in $tsRecipes){
 		$recipeID = $tsRecipe.ID
-		$ingredients = Select-MySQL -Connection $connection -table "tradeskill_recipe_entries" -where "recipe_id = $recipeID"
+        $ingredients = Invoke-MySQLQuery -Query "SELECT * FROM tradeskill_recipe_entries WHERE recipe_id = ""$recipeID"""
+		#$ingredients = Select-MySQL -Connection $connection -table "tradeskill_recipe_entries" -where "recipe_id = $recipeID"
 		# Show user items
 		Write-Host "Tradeskill Recipe for" $itemName ":"
 		foreach ($ingredient in $ingredients){
@@ -54,21 +44,21 @@ Function Get-TradeskillRecipe {
     Write-Host "`nIngredients:"
     Write-Host "------------"
     foreach($item in $ingredientList){
-        Write-Host (DisplayItemName $item.item_id) "x" $item.componentCount
+        Write-Host (Get-ItemName $item.item_id) "x" $item.componentCount
     }
 
     # Container List
     Write-Host "`nCan be combined in:"
     Write-Host "-------------------"
     foreach($item in $containerList){
-        Write-Host (DisplayItemName $item.item_id)
+        Write-Host (Get-ItemName $item.item_id)
     }
 
     # Items created list
     Write-Host "`nUpon success, player receives:"
     Write-Host "------------------------------"
     foreach($item in $creationList){
-        Write-Host (DisplayItemName $item.item_id) "x" $item.successCount
+        Write-Host (Get-ItemName $item.item_id) "x" $item.successCount
     }
 
 }

@@ -5,7 +5,8 @@ Function Get-MySQLConnection {
 	#$username = Read-Host "Enter your username"
 	#$password = Read-Host "Enter your password"
 	#$connection = Connect-MySQL -user $username -password $password -Database $database -server $server -port $port
-	$connection = Connect-MySQL -user root -password eqemu -Database peq -server localhost -port 3306
+    $creds = (Get-Credential)
+	$connection = Connect-MySQLServer -Credential $creds -ComputerName 'localhost' -database peq
 	return $connection
 }
 
